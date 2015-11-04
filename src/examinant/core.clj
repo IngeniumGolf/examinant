@@ -29,17 +29,16 @@
   (try
     (let [result-futures (for [test tests
                                browser-spec browser-specs]
-                           (let [driver (create-driver url browser-spec)]
+                           (let [driver (create-driver url browser-spec)
+                                 error-callback (:error-callback test)]
                              (future
                                (testing (str "Capabilities: " browser-spec)
                                  (try
-                                   (test driver)
+                                   ((:test test) driver)
                                    ;; Throwing an exception would cause clojure.test to abort all
                                    ;; the other remote tests, so we wrap it in an assertion instead
                                    (catch Throwable t
-                                     (is (nil? (format "Test: %s Capabilities: %s Throwable: %s"
-                                                       test browser-spec (str t)))
-                                       "Examinant caught throwable in remote test:")))
+                                     (error-callback)))
                                  (.quit driver)))))]
       ;; TODO: handle when derefing a future throws an exception, and carry on derefing the others
       (doall (map deref result-futures)))
