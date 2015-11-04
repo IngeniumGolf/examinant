@@ -44,9 +44,7 @@
       ;; TODO: handle when derefing a future throws an exception, and carry on derefing the others
       (doall (map deref result-futures)))
     (catch Throwable t
-      (error t "Error in examinant "))
-    (finally
-      (shutdown-agents)))))
+      (error t "Error in examinant ")))))
 
 
 (defn wait-until
